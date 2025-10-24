@@ -248,24 +248,26 @@ exports.updatePet = async (req, res) => {
     res.json({ message: "Pet updated successfully" });
   });
 };
-exports.deletePet = async (req, res) => {
+
+exports.deletePet = (req, res) => {
   const { id } = req.params;
 
-  const sql = `
-      DELETE FROM pet
-      WHERE pet_id = ?
-    `;
+  const sql = `DELETE FROM pet WHERE pet_id = ?`;
 
   db.query(sql, [id], (err, result) => {
     if (err)
-      return res
-        .status(500)
-        .json({ error: err.sqlMessage || "Database error" });
+      return res.status(500).json({
+        success: false,
+        error: "Error deleting pet" || err.sqlMessage,
+      });
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Pet not found" });
-    }
+    if (result.affectedRows === 0)
+      return res.status(404).json({ success: false, error: "Pet not found" });
 
-    res.json({ message: "Pet soft deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Pet deleted successfully",
+      deletedId: id,
+    });
   });
 };

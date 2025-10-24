@@ -99,15 +99,20 @@ exports.login = async (req, res) => {
       "SELECT * FROM user WHERE email = ?",
       [email],
       async (err, results) => {
-        if (err) return res.status(500).json({ message: "Database error" });
+        if (err) {
+          console.error("Database error:", err);
+          return res
+            .status(500)
+            .json({ message: "Database error", error: err.message });
+        }
 
         if (results.length === 0) {
           return res.status(401).json({ message: "Invalid email or password" });
         }
 
         const user = results[0];
-
         const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
           return res.status(401).json({ message: "Invalid email or password" });
         }
@@ -127,15 +132,19 @@ exports.login = async (req, res) => {
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
-            role: user.role, //important
+            role: user.role, // important
           },
         });
       }
     );
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
+    console.error("Login error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
 // Get logged-in user info
 exports.me = (req, res) => {
   try {
