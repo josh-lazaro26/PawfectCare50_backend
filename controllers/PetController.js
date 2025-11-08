@@ -83,7 +83,6 @@ exports.addPet = async (req, res) => {
         Name: ${name || "unknown"}
         Breed: ${breed || "unknown"}
         Size: ${size || "unknown"}
-        Image: ${image || "unknown"}
         Color: ${color || "unknown"}
       `;
 
